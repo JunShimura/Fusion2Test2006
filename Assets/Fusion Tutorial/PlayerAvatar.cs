@@ -3,12 +3,18 @@ using UnityEngine;
 
 public class PlayerAvatar : NetworkBehaviour
 {
+    // プレイヤー名のネットワークプロパティを定義する
+    [Networked]
+    public NetworkString<_16> NickName { get; set; }
+
     private NetworkCharacterController characterController;
 
     public override void Spawned()
     {
         characterController = GetComponent<NetworkCharacterController>();
         var view = GetComponent<PlayerAvatarView>();
+        // プレイヤー名をテキストに反映する
+        view.SetNickName(NickName.Value);
         // 自身がアバターの権限を持っているなら、カメラの追従対象にする
         if (HasStateAuthority)
         {
