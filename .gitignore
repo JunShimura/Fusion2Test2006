@@ -44,3 +44,9 @@ Assets/AssetStoreTools/
 
 # For example, if you use a specific plugin that generates large files
 # /Assets/MyPluginData/ß
+
+
+#================== Photon Fusion ==============
+# Photon App ID を含む設定ファイルを無視
+Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
+Assets/Photon/Fusion/Resources/FusionAppSettings.asset
