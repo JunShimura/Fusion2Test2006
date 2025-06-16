@@ -19,6 +19,9 @@ namespace GetItem.Game
         [SerializeField]
         private NetworkPrefabRef playerAvatarPrefab;
 
+        [SerializeField]
+        private Vector3[] spawnPositions = new Vector3[2]; // 2つのスポーン位置
+
         private NetworkRunner _networkRunner;
         private bool _sessionJoinTried = false;
 
@@ -33,7 +36,6 @@ namespace GetItem.Game
                 GameMode = GameMode.Shared,
                 SessionName = "" // 空文字でロビーリスト取得
             });
-           //　 _networkRunner.GetSessionList();
         }
 
         void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
@@ -70,13 +72,19 @@ namespace GetItem.Game
             // セッションへ参加したプレイヤーが自分自身かどうかを判定する
             if (player == runner.LocalPlayer)
             {
-                // アバターの初期位置を計算する（半径5の円の内部のランダムな点）
-                var rand = Random.insideUnitCircle * 5f;
-                var spawnPosition = new Vector3(rand.x, 2f, rand.y);
-                // 自分自身のアバターをスポーンする
+                // 参加順（0番目 or 1番目）を決定
+                int index = 0;
+                var players = new List<PlayerRef>(runner.ActivePlayers);
+                players.Sort((a, b) => a.RawEncoded.CompareTo(b.RawEncoded));
+                index = players.IndexOf(player);
+
+                // スポーン位置を決定
+                Vector3 spawnPosition = (index >= 0 && index < spawnPositions.Length)
+                    ? spawnPositions[index]
+                    : Vector3.zero;
+
                 runner.Spawn(playerAvatarPrefab, spawnPosition, Quaternion.identity, onBeforeSpawned: (_, networkObject) =>
                 {
-                    // プレイヤー名のネットワークプロパティの初期値として、ランダムな名前を設定する
                     networkObject.GetComponent<PlayerAvatar>().NickName = $"Player{Random.Range(0, 10000)}";
                 });
             }
