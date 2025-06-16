@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
@@ -13,9 +14,14 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField]
     private NetworkPrefabRef playerAvatarPrefab;
 
+    [SerializeField]
+    private NetworkPrefabRef networkObjectPrefab;
+
+  private NetworkRunner networkRunner;
+
     private async void Start()
     {
-        var networkRunner = Instantiate(networkRunnerPrefab);
+        networkRunner = Instantiate(networkRunnerPrefab);
         // GameLauncherを、NetworkRunnerのコールバック対象に追加する
         networkRunner.AddCallbacks(this);
         var result = await networkRunner.StartGame(new StartGameArgs
@@ -41,6 +47,15 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
                 networkObject.GetComponent<PlayerAvatar>().NickName = $"Player{Random.Range(0, 10000)}";
             });
         }
+        if (player == runner.LocalPlayer && runner.LocalPlayer == runner.ActivePlayers.Min())
+        {
+            // 本当に最初に入ったプレイヤーだけがここを通る
+
+            Debug.Log("自分自身が最初のマスタークライアントです");
+            // ネットワークオブジェクトをスポーンする
+            runner.Spawn(networkObjectPrefab, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity);
+        }
+
     }
     void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
     void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input) { }

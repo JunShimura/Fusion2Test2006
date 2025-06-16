@@ -46,8 +46,6 @@ public class PlayerAvatar : NetworkBehaviour
         animator.SetBool("Grounded", grounded);
         animator.SetBool("FreeFall", !grounded && vy < -4f);
         animator.SetFloat("MotionSpeed", 1f);
-
-
     }
 
 
