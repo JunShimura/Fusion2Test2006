@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6728236042607634378}
   - component: {fileID: 4995226872318654454}
   - component: {fileID: 4488651833436269488}
+  - component: {fileID: 7632029755546859003}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -125,5 +126,21 @@ MonoBehaviour:
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 7632029755546859003}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &7632029755546859003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223747213971740392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7113652786c186949b13a106f7885099, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startPositionOffset: {x: 0, y: 0, z: 0}
+  _endPositionOffset: {x: 0, y: 5, z: 0}
+  _movementDuration: 3

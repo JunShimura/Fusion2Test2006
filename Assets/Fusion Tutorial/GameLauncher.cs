@@ -47,12 +47,11 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
                 networkObject.GetComponent<PlayerAvatar>().NickName = $"Player{Random.Range(0, 10000)}";
             });
         }
-        if (player == runner.LocalPlayer && runner.LocalPlayer == runner.ActivePlayers.Min())
+        if (player == runner.LocalPlayer && 
+            runner.LocalPlayer == runner.ActivePlayers.OrderBy(p => p.RawEncoded).First())
         {
-            // 本当に最初に入ったプレイヤーだけがここを通る
-
+            // 最初のマスタークライアント
             Debug.Log("自分自身が最初のマスタークライアントです");
-            // ネットワークオブジェクトをスポーンする
             runner.Spawn(networkObjectPrefab, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity);
         }
 
