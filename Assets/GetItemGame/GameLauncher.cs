@@ -53,17 +53,24 @@ namespace GetItemGame
             int playerIndex = -1;
             NetworkObject instance = null;
 
-            // State Authorityのみがスポーン処理を行う
-            if (runner.IsSharedModeMasterClient)
+            // セッションへ参加したプレイヤーが自分自身かどうかを判定する
+            if (player == runner.LocalPlayer)
             {
-                playerIndex = runner.ActivePlayers.ToList().IndexOf(player);
+                //playerIndex = runner.ActivePlayers.ToList().IndexOf(player);
+                playerIndex = runner.SessionInfo.PlayerCount-1;
+
                 var spawnPos = spawnPosition[playerIndex % spawnPosition.Length];
                 Debug.Log($"プレイヤー{playerIndex}のスポーン位置: {spawnPos}");
 
-                instance = runner.Spawn(playerAvatarPrefab, spawnPos, spawnRotation, inputAuthority: player, onBeforeSpawned: (_, networkObject) =>
-                {
-                    networkObject.GetComponent<PlayerAvatar>().NickName = $"Player{Random.Range(0, 10000)}";
-                });
+                instance = runner.Spawn(
+                    playerAvatarPrefab,
+                    spawnPos,
+                    spawnRotation,
+                    onBeforeSpawned: (_, networkObject) =>
+                    {
+                        networkObject.GetComponent<PlayerAvatar>().NickName = $"Player{Random.Range(0, 10000)}";
+                    }
+                );
             }
 
             // 全クライアントでコールバック

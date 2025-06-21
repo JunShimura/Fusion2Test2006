@@ -12,18 +12,15 @@ namespace GetItemGame
         [SerializeField] private GameLauncher gameLauncher;
         [SerializeField] private TextMeshProUGUI resultText;
         [SerializeField] private GameObject gameUI;
-        
+
         [Networked] private bool gameStarted { get; set; }
-        [Networked] public int player1Score { get; set; }
-        [Networked] public int player2Score { get; set; }
+        [Networked] public int[] playerScore { get; set; }
         [Networked] private float timer { get; set; } = 20f;
-        [SerializeField] private NetworkObject player1;
-        [SerializeField] private NetworkObject player2;
-        [SerializeField] private GameObject player1ScoreText;
-        [SerializeField] private GameObject player2ScoreText;
+        [SerializeField] private NetworkObject[] players;
+        [SerializeField] private TextMeshProUGUI[] playerScoreTexts;
         [SerializeField] private GameObject startButton;
 
-        private int maxPlayers = 2; // デフォルト値
+        private const int MAX_PLAYERS = 2; // デフォルト値
 
 
         private void Awake()
@@ -38,15 +35,22 @@ namespace GetItemGame
         private void OnPlayerJoined(NetworkRunner runner, PlayerRef player, int playerIndex, NetworkObject instance)
         {
 
-                if (playerIndex == 0)
-                {
-                    player1 = instance;
-                }
-                else if (playerIndex == 1)
-                {
-                    player2 = instance;
-                }
-
+            players[playerIndex] = instance;
+            instance.GetComponent<Player>().playerId = playerIndex; // プレイヤーIDを設定
+            playerScore = new int[MAX_PLAYERS]; // スコア配列を初期化
+            instance.GetComponent<Player>().OnItemCollected += OnGetItem; // アイテム取得イベントを登録
+            Debug.Log($"Player {playerIndex} has joined the game. Player count: {runner.SessionInfo.PlayerCount}");
+        }
+        private void OnGetItem(Player player)
+        {
+            // アイテムを取得したときの処理
+            Debug.Log("Item collected by player: " + gameObject.name);
+            // アイテム取得イベントを発火
+            if (players[player.playerId] != null)
+            {
+                playerScore[player.playerId]++;
+                playerScoreTexts[player.playerId].GetComponent<TextMeshProUGUI>().text = "Score: " + playerScore[player.playerId];
+            }
         }
 
         private void OnDestroy()
@@ -67,14 +71,15 @@ namespace GetItemGame
         }
 
 
-        void Update()
+        public override void FixedUpdateNetwork()
         {
             if (Object == null)
                 return;
 
             // 最大人数に達したらゲーム開始
-            if (!gameStarted && Runner.ActivePlayers.Count() == maxPlayers)
+            if (!gameStarted && Runner.SessionInfo.PlayerCount == MAX_PLAYERS)
             {
+                Debug.Log("All players have joined. Starting game...");
                 StartGame();
             }
 
@@ -96,9 +101,9 @@ namespace GetItemGame
 
         void EndGame()
         {
-            if (player1Score > player2Score)
+            if (playerScore[0] > playerScore[1])
                 resultText.text = "You Win!";
-            else if (player1Score < player2Score)
+            else if (playerScore[0] < playerScore[1])
                 resultText.text = "You Lose!";
             else
                 resultText.text = "Draw!";
