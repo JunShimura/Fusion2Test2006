@@ -1,9 +1,9 @@
-using Fusion;
+ï»¿using Fusion;
 using UnityEngine;
 
 public class PlayerAvatar : NetworkBehaviour
 {
-    // ƒvƒŒƒCƒ„[–¼‚Ìƒlƒbƒgƒ[ƒNƒvƒƒpƒeƒB‚ğ’è‹`‚·‚é
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åã®ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’å®šç¾©ã™ã‚‹
     [Networked]
     public NetworkString<_16> NickName { get; set; }
 
@@ -15,9 +15,9 @@ public class PlayerAvatar : NetworkBehaviour
         characterController = GetComponent<NetworkCharacterController>();
         networkAnimator = GetComponentInChildren<NetworkMecanimAnimator>();
         var view = GetComponent<PlayerAvatarView>();
-        // ƒvƒŒƒCƒ„[–¼‚ğƒeƒLƒXƒg‚É”½‰f‚·‚é
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åã‚’ãƒ†ã‚­ã‚¹ãƒˆã«åæ˜ ã™ã‚‹
         view.SetNickName(NickName.Value);
-        // ©g‚ªƒAƒoƒ^[‚ÌŒ ŒÀ‚ğ‚Á‚Ä‚¢‚é‚È‚çAƒJƒƒ‰‚Ì’Ç]‘ÎÛ‚É‚·‚é
+        // è‡ªèº«ãŒã‚¢ãƒã‚¿ãƒ¼ã®æ¨©é™ã‚’æŒã£ã¦ã„ã‚‹ãªã‚‰ã€ã‚«ãƒ¡ãƒ©ã®è¿½å¾“å¯¾è±¡ã«ã™ã‚‹
         if (HasStateAuthority)
         {
             view.MakeCameraTarget();
@@ -26,18 +26,18 @@ public class PlayerAvatar : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        // ˆÚ“®
+        // ç§»å‹•
         var cameraRotation = Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f);
         var inputDirection = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
         // characterController.Move(inputDirection);
         characterController.Move(cameraRotation * inputDirection);
-        // ƒWƒƒƒ“ƒv
+        // ã‚¸ãƒ£ãƒ³ãƒ—
         if (Input.GetKey(KeyCode.Space))
         {
             characterController.Jump();
         }
 
-        // ƒAƒjƒ[ƒVƒ‡ƒ“i‚±‚±‚Å‚Íà–¾‚ğŠÈ’P‚É‚·‚é‚½‚ßA‚©‚È‚è‘åG”c‚Èİ’è‚É‚È‚Á‚Ä‚¢‚Ü‚·j
+        // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ï¼ˆã“ã“ã§ã¯èª¬æ˜ã‚’ç°¡å˜ã«ã™ã‚‹ãŸã‚ã€ã‹ãªã‚Šå¤§é›‘æŠŠãªè¨­å®šã«ãªã£ã¦ã„ã¾ã™ï¼‰
         var animator = networkAnimator.Animator;
         var grounded = characterController.Grounded;
         var vy = characterController.Velocity.y;

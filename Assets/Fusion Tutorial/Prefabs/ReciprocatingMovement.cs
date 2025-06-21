@@ -1,45 +1,60 @@
-using Fusion;
+ï»¿using Fusion;
 using UnityEngine;
 
 public class ReciprocatingMovement : NetworkBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField]
-    private Vector3 _startPositionOffset = new Vector3(0, 0, 0); // ŠJnˆÊ’u‚ÌƒIƒtƒZƒbƒg (‰ŠúˆÊ’u‚©‚ç‚Ì‘Š‘Î)
+    private Vector3 _startPositionOffset = new Vector3(0, 0, 0); // é–‹å§‹ä½ç½®ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ (åˆæœŸä½ç½®ã‹ã‚‰ã®ç›¸å¯¾)
     [SerializeField]
-    private Vector3 _endPositionOffset = new Vector3(0, 0, 5);   // I—¹ˆÊ’u‚ÌƒIƒtƒZƒbƒg (‰ŠúˆÊ’u‚©‚ç‚Ì‘Š‘Î)
+    private Vector3 _endPositionOffset = new Vector3(0, 0, 5);   // çµ‚äº†ä½ç½®ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ (åˆæœŸä½ç½®ã‹ã‚‰ã®ç›¸å¯¾)
     [SerializeField]
-    private float _movementDuration = 3.0f; // •Ğ“¹‚É‚©‚©‚éŠÔ (•b)
+    private float _movementDuration = 3.0f; // ç‰‡é“ã«ã‹ã‹ã‚‹æ™‚é–“ (ç§’)
 
-    // ƒlƒbƒgƒ[ƒN“¯Šú‚³‚ê‚éˆÊ’u
+    // ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯åŒæœŸã•ã‚Œã‚‹ä½ç½®
     [Networked]
     private Vector3 NetworkedPosition { get; set; }
+    [Networked]
+    private Vector3 NetworkedRotation { get; set; }
 
-    // ‰•œ‰^“®‚ÌŒ»İ‚Ìi’» (0‚©‚ç1‚Å³‹K‰»)
+    // å¾€å¾©é‹å‹•ã®ç¾åœ¨ã®é€²æ— (0ã‹ã‚‰1ã§æ­£è¦åŒ–)
     [Networked]
     private float CurrentProgress { get; set; }
 
-    // ˆÚ“®•ûŒü (1‚Í‡•ûŒüA-1‚Í‹t•ûŒü)
+    // ç§»å‹•æ–¹å‘ (1ã¯é †æ–¹å‘ã€-1ã¯é€†æ–¹å‘)
     [Networked]
-    private int Direction { get; set; } = 1; // ‰Šú‚Í‡•ûŒü
+    private int Direction { get; set; } = 1; // åˆæœŸã¯é †æ–¹å‘
 
-    private Vector3 _initialWorldPosition; // ƒIƒuƒWƒFƒNƒg‚ªƒXƒ|[ƒ“‚³‚ê‚½Û‚Ìƒ[ƒ‹ƒhÀ•W
+    private Vector3 _initialWorldPosition; // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒã‚¹ãƒãƒ¼ãƒ³ã•ã‚ŒãŸéš›ã®ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™
 
     public override void Spawned()
     {
-        // ƒXƒ|[ƒ“‚Ìƒ[ƒ‹ƒhÀ•W‚ğ‹L˜^
+        // ã‚¹ãƒãƒ¼ãƒ³æ™‚ã®ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‚’è¨˜éŒ²
         _initialWorldPosition = transform.position;
 
-        // ‰ŠúˆÊ’u‚ğİ’è (ƒXƒ|[ƒ“‚ÌˆÊ’u + ƒIƒtƒZƒbƒg)
+        // åˆæœŸä½ç½®ã‚’è¨­å®š (ã‚¹ãƒãƒ¼ãƒ³æ™‚ã®ä½ç½® + ã‚ªãƒ•ã‚»ãƒƒãƒˆ)
         NetworkedPosition = _initialWorldPosition + _startPositionOffset;
 
-        // ƒNƒ‰ƒCƒAƒ“ƒg‘¤‚ÅNetworkedPosition‚ğ“K—p
+        // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆå´ã§NetworkedPositionã‚’é©ç”¨
         transform.position = NetworkedPosition;
+    }
+
+        // ãƒ­ãƒ¼ã‚«ãƒ«ã€ãƒªãƒ¢ãƒ¼ãƒˆã®ä¸¡æ–¹ã§å‘¼ã°ã‚Œã‚‹ã€‚
+    // Unityã®Updateã®ã‚ˆã†ãªã‚¤ãƒ¡ãƒ¼ã‚¸ã€‚
+    public override void Render()
+    {
+        if (!HasStateAuthority)
+        {
+            // State Authority ãŒãªã„å ´åˆã€ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯åŒæœŸã•ã‚ŒãŸä½ç½®ã‚’é©ç”¨
+            transform.position = NetworkedPosition;
+            transform.rotation = Quaternion.identity; // å›è»¢ã¯å›ºå®š
+        }
+ 
     }
 
     public override void FixedUpdateNetwork()
     {
-        // State Authority ‚Ì‚İ‚ªˆÚ“®ƒƒWƒbƒN‚ğÀs
+        // State Authority ã®ã¿ãŒç§»å‹•ãƒ­ã‚¸ãƒƒã‚¯ã‚’å®Ÿè¡Œ
         if (HasStateAuthority)
         {
             CurrentProgress += Runner.DeltaTime / _movementDuration * Direction;
@@ -59,9 +74,11 @@ public class ReciprocatingMovement : NetworkBehaviour
             NetworkedPosition = targetPosition;
         }
 
-        // ‘SƒNƒ‰ƒCƒAƒ“ƒg‚ÅˆÊ’u‚ğ“K—p
+        NetworkedRotation = Quaternion.identity.eulerAngles; // å›è»¢ã¯å›ºå®š
+    
+        // å…¨ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã§ä½ç½®ã‚’é©ç”¨
         transform.position = NetworkedPosition;
-
+        transform.rotation = Quaternion.Euler(NetworkedRotation);
         Debug.Log($"{Runner.LocalPlayer}: {NetworkedPosition}");
     }
 }
