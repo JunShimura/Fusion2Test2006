@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: "Assets/Fusion Tutorial/Fusion\uFF12Test.unity"
-    guid: e125cabeb1ff94ad9a03ee8b067db85f
+    path: Assets/GetItemGame/GetItemGame.unity
+    guid: 7a189c3b5dfc548dd8ec51a6b7ed7062
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
